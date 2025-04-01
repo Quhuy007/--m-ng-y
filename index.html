@@ -62,17 +62,12 @@ h1 {
     </div>
 
     <script>
-        async function startCountdown() {
+        function startCountdown() {
             // Đặt ngày cố định ở đây (ví dụ: 1 tháng 5 năm 2025)
-            let targetDate = new Date("2025-06-26T00:00:00").getTime();
-
-            // Lấy thời gian chính xác từ API
-            let response = await fetch("http://worldtimeapi.org/api/timezone/Asia/Ho_Chi_Minh");
-            let data = await response.json();
-            let now = new Date(data.datetime).getTime();
+            let targetDate = new Date("2025-05-01T00:00:00").getTime();
 
             setInterval(() => {
-                now += 1000; // Tăng thời gian mỗi giây
+                let now = new Date().getTime();
                 let timeLeft = targetDate - now;
 
                 if (timeLeft < 0) {
