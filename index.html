@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đếm Ngược Ngày Quan Trọng</title>
+    <style>
+        body {
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    background: linear-gradient(to right, #ff758c, #ff7eb3);
+    color: white;
+    padding: 50px;
+}
+
+.container {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 30px;
+    border-radius: 15px;
+    display: inline-block;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+#countdown {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.time-box {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    margin: 5px;
+    border-radius: 10px;
+    width: 80px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.time-box p {
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Đếm Ngược Ngày Quan Trọng</h1>
+        <div id="countdown">
+            <div class="time-box"><span id="days">00</span><p>Ngày</p></div>
+            <div class="time-box"><span id="hours">00</span><p>Giờ</p></div>
+            <div class="time-box"><span id="minutes">00</span><p>Phút</p></div>
+            <div class="time-box"><span id="seconds">00</span><p>Giây</p></div>
+        </div>
+    </div>
+
+    <script>
+        async function startCountdown() {
+            // Đặt ngày cố định ở đây (ví dụ: 1 tháng 5 năm 2025)
+            let targetDate = new Date("2025-06-26T00:00:00").getTime();
+
+            try {
+                // Lấy thời gian chính xác từ API TimeZoneDB
+                let response = await fetch("http://api.timezonedb.com/v2.1/get-time-zone?key=L5SQZJ9EZ31C&format=json&by=zone&zone=Asia/Ho_Chi_Minh");
+                
+                // Kiểm tra nếu API Key không hợp lệ
+                if (!response.ok) {
+                    throw new Error("API Key không hợp lệ hoặc không hoạt động.");
+                }
+
+                let data = await response.json();
+
+                // Kiểm tra nếu API trả về lỗi
+                if (data.status !== "OK") {
+                    throw new Error("API Key không hợp lệ hoặc không hoạt động.");
+                }
+
+                let now = new Date(data.formatted).getTime();
+
+                setInterval(() => {
+                    now += 1000; // Tăng thời gian mỗi giây
+                    let timeLeft = targetDate - now;
+
+                    if (timeLeft < 0) {
+                        document.getElementById("countdown").innerHTML = "<h2>Đã đến ngày quan trọng!</h2>";
+                        return;
+                    }
+
+                    let days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    let hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                    document.getElementById("days").innerText = days < 10 ? "0" + days : days;
+                    document.getElementById("hours").innerText = hours < 10 ? "0" + hours : hours;
+                    document.getElementById("minutes").innerText = minutes < 10 ? "0" + minutes : minutes;
+                    document.getElementById("seconds").innerText = seconds < 10 ? "0" + seconds : seconds;
+                }, 1000);
+            } catch (error) {
+                // Hiển thị thông báo lỗi nếu API Key không hợp lệ
+                alert(error.message);
+                document.body.innerHTML = `<h1 style="color: red;">Lỗi: ${error.message}</h1>`;
+            }
+        }
+
+        // Tự động bắt đầu đếm ngược khi tải trang
+        startCountdown();
+    </script>
+</body>
+</html>
