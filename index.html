@@ -66,48 +66,30 @@ h1 {
             // Đặt ngày cố định ở đây (ví dụ: 1 tháng 5 năm 2025)
             let targetDate = new Date("2025-06-26T00:00:00").getTime();
 
-            try {
-                // Lấy thời gian chính xác từ API TimeZoneDB
-                let response = await fetch("http://api.timezonedb.com/v2.1/get-time-zone?key=L5SQZJ9EZ31C&format=json&by=zone&zone=Asia/Ho_Chi_Minh");
-                
-                // Kiểm tra nếu API Key không hợp lệ
-                if (!response.ok) {
-                    throw new Error("API Key không hợp lệ hoặc không hoạt động.");
+            // Lấy thời gian chính xác từ API
+            let response = await fetch("http://worldtimeapi.org/api/timezone/Asia/Ho_Chi_Minh");
+            let data = await response.json();
+            let now = new Date(data.datetime).getTime();
+
+            setInterval(() => {
+                now += 1000; // Tăng thời gian mỗi giây
+                let timeLeft = targetDate - now;
+
+                if (timeLeft < 0) {
+                    document.getElementById("countdown").innerHTML = "<h2>Đã đến ngày quan trọng!</h2>";
+                    return;
                 }
 
-                let data = await response.json();
+                let days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                let hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
 
-                // Kiểm tra nếu API trả về lỗi
-                if (data.status !== "OK") {
-                    throw new Error("API Key không hợp lệ hoặc không hoạt động.");
-                }
-
-                let now = new Date(data.formatted).getTime();
-
-                setInterval(() => {
-                    now += 1000; // Tăng thời gian mỗi giây
-                    let timeLeft = targetDate - now;
-
-                    if (timeLeft < 0) {
-                        document.getElementById("countdown").innerHTML = "<h2>Đã đến ngày quan trọng!</h2>";
-                        return;
-                    }
-
-                    let days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                    let hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-                    document.getElementById("days").innerText = days < 10 ? "0" + days : days;
-                    document.getElementById("hours").innerText = hours < 10 ? "0" + hours : hours;
-                    document.getElementById("minutes").innerText = minutes < 10 ? "0" + minutes : minutes;
-                    document.getElementById("seconds").innerText = seconds < 10 ? "0" + seconds : seconds;
-                }, 1000);
-            } catch (error) {
-                // Hiển thị thông báo lỗi nếu API Key không hợp lệ
-                alert(error.message);
-                document.body.innerHTML = `<h1 style="color: red;">Lỗi: ${error.message}</h1>`;
-            }
+                document.getElementById("days").innerText = days < 10 ? "0" + days : days;
+                document.getElementById("hours").innerText = hours < 10 ? "0" + hours : hours;
+                document.getElementById("minutes").innerText = minutes < 10 ? "0" + minutes : minutes;
+                document.getElementById("seconds").innerText = seconds < 10 ? "0" + seconds : seconds;
+            }, 1000);
         }
 
         // Tự động bắt đầu đếm ngược khi tải trang
